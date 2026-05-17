@@ -27,11 +27,15 @@ func (a *Anthropic) Chat(messages []Message) (string, error) {
 	var system string
 	apiMessages := make([]map[string]string, 0, len(messages))
 	for _, m := range messages {
+		text := ""
+		if m.Content != nil {
+			text = *m.Content
+		}
 		switch m.Role {
 		case RoleSystem:
-			system = m.Content
+			system = text
 		default:
-			apiMessages = append(apiMessages, map[string]string{"role": m.Role, "content": m.Content})
+			apiMessages = append(apiMessages, map[string]string{"role": m.Role, "content": text})
 		}
 	}
 
