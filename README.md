@@ -4,6 +4,8 @@
 
 ## 功能
 
+- **工具调用（Function Calling）** — LLM 自主调用 bash、read、write、edit 等工具
+- **多轮工具循环** — LLM 可多次调工具并基于结果继续推理，最多 10 轮
 - **多 Provider 支持** — 已实现 DeepSeek 和 Anthropic Claude，通过 `llm.Provider` 接口扩展
 - **流式输出** — 逐字打印回复，体验流畅
 - **对话记忆** — 自动维护历史上下文，支持 `/reset` 清空、超长自动压缩
@@ -37,24 +39,29 @@ go run ./cmd/miniCC/
 ```
 ├── cmd/miniCC/
 │   ├── main.go              # CLI 入口
-│   └── conversation.go      # 对话记忆与自动压缩
+│   └── conversation.go      # 对话记忆、自动压缩、工具循环
 ├── llm/
-│   ├── provider.go      # Provider 接口定义
-│   ├── deepseek.go      # DeepSeek 实现
-│   └── anthropic.go     # Claude 实现
+│   ├── provider.go          # Provider / ToolCall 接口定义
+│   ├── deepseek.go          # DeepSeek 实现（含 tools 支持）
+│   └── anthropic.go         # Claude 实现
+├── tool/
+│   ├── tool.go              # Tool 接口 + 默认注册中心
+│   ├── bash.go              # bash 工具：执行 shell 命令
+│   ├── read.go              # read 工具：读取文件
+│   ├── write.go             # write 工具：写入文件
+│   └── edit.go              # edit 工具：精确替换文件内容
 └── command/
-    ├── command.go       # Command 接口 + 注册
-    ├── bash.go          # /bash 命令
-    ├── help.go          # /help 命令
-    ├── quit.go          # /exit 命令
-    └── reset.go         # /reset 命令
+    ├── command.go            # Command 接口 + 注册
+    ├── bash.go               # /bash 命令
+    ├── help.go               # /help 命令
+    ├── quit.go               # /exit 命令
+    └── reset.go              # /reset 命令
 ```
 
 ## 尚未支持（TODO）
 
-- **Tool/Function Calling** — LLM 自主调用工具（读写文件、搜索等），这是与完整 agent 框架的核心差距
+- **MCP 协议支持** — 外接任意的社区 MCP Server 扩展能力
 - **持久化** — 对话历史仅在内存，退出即丢
-- **配置外部化** — API key、模型名称等硬编码在代码中
-- **多轮 Tool Calling** — LLM 多次调用工具并基于结果推理
-- **Web Search / RAG** — 联网搜索或本地文档检索
-- **System Prompt 配置** — 通过命令或配置文件自定义角色行为
+- **代码索引** — 符号搜索、引用跳转等 IDE 级代码理解
+- **权限确认** — 工具执行前的确认机制
+- **Web Search** — 联网搜索能力
